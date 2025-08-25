@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Tangkap Kotak (HP)</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+  }
+  #gameArea {
+    position: relative;
+    width: 90vw;
+    height: 60vh;
+    margin: 20px auto;
+    background-color: #fff;
+    border: 2px solid #000;
+    touch-action: none; /* supaya sentuhan lebih smooth */
+  }
+  #box {
+    width: 80px;
+    height: 80px;
+    position: absolute;
+    background-color: red;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  #score {
+    font-size: 24px;
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Game Tangkap Kotak</h1>
+<div id="gameArea">
+  <div id="box"></div>
+</div>
+<div id="score">Skor: 0</div>
+
+<script>
+  const box = document.getElementById('box');
+  const gameArea = document.getElementById('gameArea');
+  const scoreDisplay = document.getElementById('score');
+  let score = 0;
+
+  function moveBox() {
+    const maxX = gameArea.clientWidth - box.offsetWidth;
+    const maxY = gameArea.clientHeight - box.offsetHeight;
+    const randomX = Math.floor(Math.random() * maxX);
+    const randomY = Math.floor(Math.random() * maxY);
+    box.style.left = randomX + 'px';
+    box.style.top = randomY + 'px';
+  }
+
+  function addScore() {
+    score++;
+    scoreDisplay.textContent = 'Skor: ' + score;
+    moveBox();
+  }
+
+  // Tangkap klik dan sentuhan
+  box.addEventListener('click', addScore);
+  box.addEventListener('touchstart', addScore);
+
+  moveBox();
+  setInterval(moveBox, 2000);
+</script>
+
+</body>
+</html>
