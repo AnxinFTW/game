@@ -3,53 +3,92 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Game Tangkap Kotak (HP)</title>
+<title>Game Tangkap Kotak Seru</title>
 <style>
   body {
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     text-align: center;
     margin: 0;
     padding: 0;
-    background-color: #f0f0f0;
+    background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+    color: #fff;
   }
+
+  h1 {
+    margin-top: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  }
+
   #gameArea {
     position: relative;
     width: 90vw;
     height: 60vh;
     margin: 20px auto;
-    background-color: #fff;
-    border: 2px solid #000;
-    touch-action: none; /* supaya sentuhan lebih smooth */
+    background: linear-gradient(to bottom, #fff, #e0e0e0);
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    overflow: hidden;
+    touch-action: none;
   }
+
   #box {
     width: 80px;
     height: 80px;
     position: absolute;
-    background-color: red;
-    border-radius: 10px;
+    background: radial-gradient(circle, #ff5f6d, #ffc371);
+    border-radius: 15px;
     cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    transition: transform 0.2s, box-shadow 0.2s, left 0.5s, top 0.5s;
   }
-  #score {
-    font-size: 24px;
+
+  #box:active {
+    transform: scale(0.9);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+  }
+
+  .obstacle {
+    width: 60px;
+    height: 60px;
+    position: absolute;
+    background-color: black;
+    border-radius: 50%;
+    opacity: 0.7;
+    transition: left 0.5s, top 0.5s;
+  }
+
+  #score, #timer {
+    font-size: 28px;
     margin-top: 10px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    display: inline-block;
+    margin-right: 20px;
   }
 </style>
 </head>
 <body>
 
-<h1>Game Tangkap Kotak</h1>
+<h1>Game Tangkap Kotak Seru</h1>
+<div>
+  <div id="score">Skor: 0</div>
+  <div id="timer">Waktu: 30</div>
+</div>
 <div id="gameArea">
   <div id="box"></div>
 </div>
-<div id="score">Skor: 0</div>
 
 <script>
   const box = document.getElementById('box');
   const gameArea = document.getElementById('gameArea');
   const scoreDisplay = document.getElementById('score');
+  const timerDisplay = document.getElementById('timer');
+
   let score = 0;
+  let time = 30;
+  let gameOver = false;
 
   function moveBox() {
+    if(gameOver) return;
     const maxX = gameArea.clientWidth - box.offsetWidth;
     const maxY = gameArea.clientHeight - box.offsetHeight;
     const randomX = Math.floor(Math.random() * maxX);
@@ -59,17 +98,54 @@
   }
 
   function addScore() {
+    if(gameOver) return;
     score++;
     scoreDisplay.textContent = 'Skor: ' + score;
     moveBox();
   }
 
-  // Tangkap klik dan sentuhan
+  // Kotak
   box.addEventListener('click', addScore);
   box.addEventListener('touchstart', addScore);
 
+  // Timer
+  const timer = setInterval(() => {
+    if(time > 0){
+      time--;
+      timerDisplay.textContent = 'Waktu: ' + time;
+      maybeSpawnObstacle();
+    } else {
+      clearInterval(timer);
+      gameOver = true;
+      alert('Waktu habis! Skor kamu: ' + score);
+    }
+  }, 1000);
+
   moveBox();
   setInterval(moveBox, 2000);
+
+  // Obstacle
+  function maybeSpawnObstacle(){
+    if(Math.random() < 0.3 && !gameOver){ // 30% chance
+      const obs = document.createElement('div');
+      obs.classList.add('obstacle');
+      const maxX = gameArea.clientWidth - 60;
+      const maxY = gameArea.clientHeight - 60;
+      obs.style.left = Math.floor(Math.random() * maxX) + 'px';
+      obs.style.top = Math.floor(Math.random() * maxY) + 'px';
+      gameArea.appendChild(obs);
+
+      obs.addEventListener('click', () => {
+        score = Math.max(0, score - 1); // skor dikurangi 1
+        scoreDisplay.textContent = 'Skor: ' + score;
+        obs.remove();
+      });
+
+      setTimeout(() => {
+        if(obs.parentElement) obs.remove();
+      }, 3000); // hilang setelah 3 detik
+    }
+  }
 </script>
 
 </body>
